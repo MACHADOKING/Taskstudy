@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  provider  AuthProvider @default(LOCAL)
+  googleId  String? @unique
+  avatarUrl String?
+  googlePictureUrl String?
+  googleConnected Boolean @default(false)
+  // Notification preferences
+  notificationEmail String?   @default("")
+  phone             String?   @default("")
+  notifyByEmail     Boolean   @default(true)
+  notifyByTelegram  Boolean   @default(false)
+  notifyByWhatsApp  Boolean   @default(false)
+  consentGiven      Boolean   @default(false)
+  telegramChatId    String?
+  telegramLinkCode  String?   @unique
+  telegramLinkCodeGeneratedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  tasks Task[]
+  notifications Notification[]
+  @@map("users")
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @default("")
+  subject     String
+  type        TaskType
+  dueDate     DateTime
+  priority    Priority @default(MEDIUM)
+  status      Status   @default(PENDING)
+  attachments Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("tasks")
+}
+
+enum TaskType {
+  ASSIGNMENT
+  EXAM
+  READING
+
+  @@map("task_type")
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+
+  @@map("priority")
+}
+
+enum Status {
+  PENDING
+  COMPLETED
+
+  @@map("status")
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+
+  @@map("auth_provider")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  message   String
+  payload   Json?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, read, createdAt])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  DAILY_SUMMARY
+  URGENT_ALERT
+
+  @@map("notification_type")
+}
