@@ -26,12 +26,13 @@ services:
         sync: false
       - key: EMAIL_PASS
         sync: false
-    
+
+staticSites:
   # Frontend Static Site
-  - type: static_site
-    name: taskstudy-frontend
+  - name: taskstudy-frontend
+    plan: free
     buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: frontend/dist
+    publishPath: frontend/dist
     pullRequestPreviewsEnabled: false
     headers:
       - path: /*
