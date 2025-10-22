@@ -10,42 +10,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  provider  AuthProvider @default(LOCAL)
-  googleId  String? @unique
-  avatarUrl String?
-  googlePictureUrl String?
-  googleConnected Boolean @default(false)
-  // Notification preferences
-  notificationEmail String?   @default("")
-  phone             String?   @default("")
-  notifyByEmail     Boolean   @default(true)
-  notifyByTelegram  Boolean   @default(false)
-  notifyByWhatsApp  Boolean   @default(false)
-  consentGiven      Boolean   @default(false)
-  telegramChatId    String?
-  telegramLinkCode  String?   @unique
-  telegramLinkCodeGeneratedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  tasks Task[]
-  notifications Notification[]
-  @@map("users")
+enum TaskType {
+  ASSIGNMENT
+  EXAM
+  READING
 }
 
-model Task {
-  id          String   @id @default(cuid())
-  title       String
-  description String   @default("")
-  subject     String
-  type        TaskType
-  dueDate     DateTime
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum Status {
+  PENDING
+  COMPLETED
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
+
+enum NotificationType {
+  DAILY_SUMMARY
+  URGENT_ALERT
+}
   priority    Priority @default(MEDIUM)
   status      Status   @default(PENDING)
   attachments Json?
