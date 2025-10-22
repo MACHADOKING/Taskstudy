@@ -26,6 +26,8 @@ services:
         sync: false
       - key: EMAIL_PASS
         sync: false
+      - key: NPM_CONFIG_PRODUCTION
+        value: "false"
 
   # Frontend Static Site
   - type: web
