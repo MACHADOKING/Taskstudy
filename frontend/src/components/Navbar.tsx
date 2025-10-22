@@ -509,6 +509,11 @@ export const Navbar: React.FC = () => {
   const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), []);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      setUnread(0);
+      return;
+    }
+
     let mounted = true;
     (async () => {
       try {
@@ -519,7 +524,7 @@ export const Navbar: React.FC = () => {
       }
     })();
     return () => { mounted = false; };
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (!userMenuOpen) return;
