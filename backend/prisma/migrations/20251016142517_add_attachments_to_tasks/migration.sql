@@ -1,2 +1,1 @@
--- AlterTable
-ALTER TABLE "tasks" ADD COLUMN "attachments" JSONB;
+-- Legacy SQLite migration intentionally left empty after PostgreSQL baseline reset.
