@@ -280,6 +280,7 @@ export const TaskFiltersComponent: React.FC<TaskFiltersProps> = ({
 	onToggleCollapse,
 }) => {
 	const { t, language } = useTranslation();
+	const filterHeading = language?.startsWith('pt') ? 'Filtrar' : t('filterSearchTasks');
 
 	const handleFilterChange = (key: keyof TaskFilters, value: string) => {
 		onFiltersChange({
@@ -408,7 +409,7 @@ export const TaskFiltersComponent: React.FC<TaskFiltersProps> = ({
 	return (
 		<FiltersContainer $collapsed={isCollapsed}>
 			<FiltersHeader>
-				<FiltersTitle>🔍 {t('filterSearchTasks')}</FiltersTitle>
+				<FiltersTitle>{filterHeading}</FiltersTitle>
 				{showActions && (
 					<HeaderActions>
 						{onToggleCollapse && (

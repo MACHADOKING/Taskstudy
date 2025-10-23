@@ -227,8 +227,17 @@ export const TasksChart: React.FC<TasksChartProps> = ({ tasks }) => {
               role="img"
             >
               <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} />
-              <XAxis dataKey="month" tick={{ fill: chartColors.axis }} axisLine={{ stroke: chartColors.grid }} tickLine={{ stroke: chartColors.grid }} />
-              <YAxis tick={{ fill: chartColors.axis }} axisLine={{ stroke: chartColors.grid }} tickLine={{ stroke: chartColors.grid }} />
+              <XAxis
+                dataKey="month"
+                tick={{ fill: chartColors.axis, fontSize: 11 }}
+                axisLine={{ stroke: chartColors.grid }}
+                tickLine={{ stroke: chartColors.grid }}
+              />
+              <YAxis
+                tick={{ fill: chartColors.axis, fontSize: 11 }}
+                axisLine={{ stroke: chartColors.grid }}
+                tickLine={{ stroke: chartColors.grid }}
+              />
               <Tooltip 
                 contentStyle={{
                   backgroundColor: chartColors.tooltipBg,
@@ -329,6 +338,8 @@ export const TasksChart: React.FC<TasksChartProps> = ({ tasks }) => {
                   outerRadius={80}
                   paddingAngle={5}
                   dataKey="value"
+                  label={({ name, percent, value }) => (value > 0 ? `${name} ${(percent * 100).toFixed(0)}%` : '')}
+                  labelLine={false}
                 >
                   {(visibleTypeData.length > 0 ? visibleTypeData : typeData).map((entry, index) => (
                     <Cell key={`cell-type-${index}`} fill={entry.color} />

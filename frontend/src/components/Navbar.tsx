@@ -635,7 +635,7 @@ export const Navbar: React.FC = () => {
       <Nav role="navigation" aria-label="Main navigation">
         <NavContainer>
           <Logo to={isAuthenticated ? '/dashboard' : '/'} title="TaskStudy" aria-label="TaskStudy Home">
-            <LogoImg src="/Taskstudy_icon_definitive.png" alt="TaskStudy" />
+            <LogoImg src="/Taskstudy%20icon%202.0.png" alt="TaskStudy" />
             <Brand>TaskStudy</Brand>
           </Logo>
         
