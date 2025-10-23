@@ -1,4 +1,5 @@
 import nodemailer, { Transporter } from 'nodemailer';
+import type SMTPTransport from 'nodemailer/lib/smtp-transport';
 
 export interface PendingTaskDigestItem {
   title: string;
@@ -40,12 +41,13 @@ const getTransporter = (): Transporter => {
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
   const secure = resolveBoolean(process.env.SMTP_SECURE, port === 465);
+  const startTls = resolveBoolean(process.env.SMTP_STARTTLS, false);
 
   if (!user || !pass) {
     throw new Error('SMTP credentials are not configured. Provide SMTP_USER and SMTP_PASS.');
   }
 
-  cachedTransporter = nodemailer.createTransport({
+  const transporterConfig: SMTPTransport.Options = {
     host,
     port,
     secure,
@@ -53,7 +55,14 @@ const getTransporter = (): Transporter => {
       user,
       pass,
     },
-  });
+  };
+
+  if (startTls) {
+    transporterConfig.secure = false;
+    transporterConfig.requireTLS = true;
+  }
+
+  cachedTransporter = nodemailer.createTransport(transporterConfig);
 
   return cachedTransporter;
 };
