@@ -67,13 +67,14 @@ const NavLinks = styled.div`
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   min-width: 200px;
   flex-wrap: wrap;
 
   @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
     order: 3;
     width: 100%;
+    flex: 1 1 100%;
     justify-content: space-around;
     gap: 1rem;
   }
