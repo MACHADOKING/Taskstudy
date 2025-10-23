@@ -66,10 +66,10 @@ const Brand = styled.span`
 const NavLinks = styled.div`
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 0.75rem;
   flex: 0 0 auto;
-  min-width: 200px;
-  flex-wrap: wrap;
+  min-width: 0;
+  flex-wrap: nowrap;
 
   @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
     order: 3;
@@ -277,7 +277,7 @@ const SettingsContainer = styled.div`
 const DesktopNavGroup = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   margin-left: auto;
 
   @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
