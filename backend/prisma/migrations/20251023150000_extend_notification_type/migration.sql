@@ -1,0 +1,4 @@
+-- AlterEnum
+ALTER TYPE "NotificationType" ADD VALUE 'DAILY_PENDING_TASKS';
+ALTER TYPE "NotificationType" ADD VALUE 'WEEKLY_REPORT';
+ALTER TYPE "NotificationType" ADD VALUE 'MONTHLY_REPORT';

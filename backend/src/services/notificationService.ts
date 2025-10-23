@@ -14,7 +14,7 @@ import {
 } from './emailService';
 import { sendTelegramMessage } from './telegramService';
 import { sendWhatsAppMessage } from './whatsappService.js';
-import { Priority, Status, Task as PrismaTask, User as PrismaUser } from '@prisma/client';
+import { Prisma, Priority, Status, Task as PrismaTask, User as PrismaUser } from '@prisma/client';
 
 const REMINDER_THRESHOLDS_HOURS = [24, 48, 72];
 const DIGEST_LOOKAHEAD_DAYS = 7;
@@ -290,14 +290,14 @@ export interface DailyDigestBatchSummary {
 export const sendPendingTasksDigest = async (
   recipientOverride?: string
 ): Promise<DailyDigestBatchSummary> => {
-  const whereClause = recipientOverride
+  const whereClause: Prisma.UserWhereInput | undefined = recipientOverride
     ? {
         OR: [
           { email: recipientOverride },
           {
             notificationEmail: {
               equals: recipientOverride,
-              mode: 'insensitive',
+              mode: Prisma.QueryMode.insensitive,
             },
           },
         ],
