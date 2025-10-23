@@ -26,6 +26,15 @@ const ChartContainer = styled.div`
   border-radius: ${(props) => props.theme.borderRadius.large};
   box-shadow: ${(props) => props.theme.shadows.medium};
   margin-bottom: 2rem;
+
+  @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
+    padding: 1.25rem;
+    border-radius: ${(props) => props.theme.borderRadius.medium};
+  }
+
+  @media (max-width: 480px) {
+    padding: 1.1rem;
+  }
 `;
 
 const ChartTitle = styled.h3`
@@ -45,8 +54,16 @@ const ChartsGrid = styled.div`
   }
 `;
 
-const ChartSection = styled.div`
-  height: 300px;
+const ChartSection = styled.div<{ $size?: 'large' }>`
+  height: ${(props) => (props.$size === 'large' ? '340px' : '280px')};
+
+  @media (max-width: 1024px) {
+    height: ${(props) => (props.$size === 'large' ? '320px' : '260px')};
+  }
+
+  @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
+    height: ${(props) => (props.$size === 'large' ? '300px' : '240px')};
+  }
 `;
 
 const ChartFooter = styled.div`
@@ -68,6 +85,7 @@ const LegendList = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+  row-gap: 0.65rem;
 `;
 
 const LegendItem = styled.div`
@@ -193,13 +211,15 @@ export const TasksChart: React.FC<TasksChartProps> = ({ tasks }) => {
     { completed: 0, pending: 0, overdue: 0 }
   );
   const totalTasks = tasks.length;
+  const visibleStatusData = statusData.filter((entry) => entry.value > 0);
+  const visibleTypeData = typeData.filter((entry) => entry.value > 0);
 
   return (
     <>
       <ChartContainer>
         <ChartTitle>📊 {t('monthlyPerformanceChart')}</ChartTitle>
         <ChartAccessibility tasks={tasks} chartType="monthly" />
-        <ChartSection>
+        <ChartSection $size="large">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart 
               data={monthlyData}
@@ -255,17 +275,17 @@ export const TasksChart: React.FC<TasksChartProps> = ({ tasks }) => {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart role="img" aria-label="Task status distribution pie chart">
                 <Pie
-                  data={statusData}
+                  data={visibleStatusData.length > 0 ? visibleStatusData : statusData}
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent, value }) => (value > 0 ? `${name} ${(percent * 100).toFixed(0)}%` : '')}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
                 >
-                  {statusData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  {(visibleStatusData.length > 0 ? visibleStatusData : statusData).map((entry, index) => (
+                    <Cell key={`cell-status-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
                 <Tooltip 
@@ -284,7 +304,7 @@ export const TasksChart: React.FC<TasksChartProps> = ({ tasks }) => {
           <ChartFooter>
             <ChartDescription>{t('chartStatusDescription')}</ChartDescription>
             <LegendList>
-              {statusData.map((entry) => (
+              {(visibleStatusData.length > 0 ? visibleStatusData : statusData).map((entry) => (
                 <LegendItem key={entry.name}>
                   <LegendColor $color={entry.color} />
                   <LegendLabel>{entry.name}</LegendLabel>
@@ -302,7 +322,7 @@ export const TasksChart: React.FC<TasksChartProps> = ({ tasks }) => {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart role="img" aria-label="Task types distribution donut chart">
                 <Pie
-                  data={typeData}
+                  data={visibleTypeData.length > 0 ? visibleTypeData : typeData}
                   cx="50%"
                   cy="50%"
                   innerRadius={40}
@@ -310,8 +330,8 @@ export const TasksChart: React.FC<TasksChartProps> = ({ tasks }) => {
                   paddingAngle={5}
                   dataKey="value"
                 >
-                  {typeData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  {(visibleTypeData.length > 0 ? visibleTypeData : typeData).map((entry, index) => (
+                    <Cell key={`cell-type-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
                 <Tooltip 
@@ -330,7 +350,7 @@ export const TasksChart: React.FC<TasksChartProps> = ({ tasks }) => {
           <ChartFooter>
             <ChartDescription>{t('chartTypeDescription')}</ChartDescription>
             <LegendList>
-              {typeData.map((entry) => (
+              {(visibleTypeData.length > 0 ? visibleTypeData : typeData).map((entry) => (
                 <LegendItem key={entry.name}>
                   <LegendColor $color={entry.color} />
                   <LegendLabel>{entry.name}</LegendLabel>

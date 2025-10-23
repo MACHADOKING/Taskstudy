@@ -23,12 +23,25 @@ interface TaskFiltersProps {
 
 const FiltersContainer = styled.div<{ $collapsed?: boolean }>`
 	background: ${(props) => props.theme.colors.white};
-	padding: ${(props) => (props.$collapsed ? '1.2rem 1.75rem' : '1.75rem')};
+	padding: ${(props) => (props.$collapsed ? '1.15rem 1.6rem' : '1.6rem')};
 	border-radius: ${(props) => props.theme.borderRadius.large};
 	box-shadow: ${(props) => props.theme.shadows.medium};
 	border: 1px solid ${(props) => props.theme.colors.borderLight};
-	margin-bottom: 1.5rem;
-	transition: padding 0.2s ease;
+	margin: 0 0 1.5rem;
+	transition: padding 0.2s ease, box-shadow 0.2s ease;
+	width: 100%;
+
+	@media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
+		padding: ${(props) => (props.$collapsed ? '1rem 0' : '1.2rem 0')};
+		border-radius: ${(props) => props.theme.borderRadius.medium};
+		box-shadow: ${(props) => props.theme.shadows.small};
+	}
+
+	@media (max-width: 480px) {
+		padding: ${(props) => (props.$collapsed ? '0.9rem 0' : '1.1rem 0')};
+		margin-left: 0;
+		margin-right: 0;
+	}
 `;
 
 const FiltersHeader = styled.div`
@@ -36,12 +49,19 @@ const FiltersHeader = styled.div`
 	justify-content: space-between;
 	align-items: center;
 	margin-bottom: 1rem;
+	gap: 1rem;
+	flex-wrap: wrap;
+
+	@media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
+		align-items: flex-start;
+	}
 `;
 
 const HeaderActions = styled.div`
 	display: inline-flex;
 	align-items: center;
 	gap: 0.75rem;
+	flex-wrap: wrap;
 `;
 
 const FiltersTitle = styled.h3`
@@ -94,10 +114,21 @@ const FiltersGrid = styled.div`
 	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 	gap: 1rem;
 	align-items: end;
+	padding: 0 1.25rem;
+
+	@media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
+		padding: 0 0.75rem;
+	}
+
+	@media (max-width: 480px) {
+		padding: 0 0.5rem;
+		gap: 0.85rem;
+	}
 `;
 
 const FiltersContent = styled.div<{ $collapsed?: boolean }>`
 	display: ${(props) => (props.$collapsed ? 'none' : 'block')};
+	margin: 0 auto;
 `;
 
 const FilterGroup = styled.div`
@@ -199,6 +230,15 @@ const ActiveFiltersContainer = styled.div`
 	gap: 0.5rem;
 	margin: 0.75rem 0 0;
 	flex-wrap: wrap;
+	padding: 0 1.25rem;
+
+	@media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
+		padding: 0 0.75rem;
+	}
+
+	@media (max-width: 480px) {
+		padding: 0 0.5rem;
+	}
 `;
 
 const ActiveFilterTag = styled.div`

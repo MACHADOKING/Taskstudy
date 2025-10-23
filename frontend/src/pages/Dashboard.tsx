@@ -11,9 +11,21 @@ import { TaskFiltersComponent, TaskFilters } from '../components/TaskFilters';
 const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 2rem 2.5rem;
   background: ${(props) => props.theme.colors.background};
   min-height: 100vh;
+
+  @media (max-width: 1024px) {
+    padding: 1.75rem 1.75rem;
+  }
+
+  @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
+    padding: 1.5rem 1.25rem 2.5rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 1.25rem 0.75rem 2rem;
+  }
 `;
 
 const Header = styled.div`
@@ -25,9 +37,10 @@ const Header = styled.div`
   background: ${(props) => props.theme.colors.background};
   color: ${(props) => props.theme.colors.text};
 
-  @media (max-width: 768px) {
+  @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
     flex-direction: column;
     align-items: stretch;
+    gap: 1.25rem;
   }
 `;
 
@@ -59,10 +72,15 @@ const OverviewOverlay = styled.div`
   background: rgba(15, 23, 42, 0.55);
   backdrop-filter: blur(2px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 24px;
+  padding: 32px;
   z-index: 1000;
+  overflow-y: auto;
+
+  @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
+    padding: 24px 16px;
+  }
 `;
 
 const OverviewDialog = styled.div`
@@ -70,12 +88,24 @@ const OverviewDialog = styled.div`
   background: ${(props) => props.theme.colors.white};
   border-radius: ${(props) => props.theme.borderRadius.large};
   box-shadow: ${(props) => props.theme.shadows.large};
-  padding: 32px;
+  padding: 28px;
   color: ${(props) => props.theme.colors.text};
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
   position: relative;
+  max-height: min(90vh, 620px);
+  overflow-y: auto;
+
+  @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
+    padding: 24px;
+    gap: 18px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 20px 18px;
+    border-radius: ${(props) => props.theme.borderRadius.medium};
+  }
 `;
 
 const OverviewHeader = styled.header`

@@ -20,6 +20,15 @@ const Container = styled.div`
   border-radius: ${(props) => props.theme.borderRadius.large};
   box-shadow: ${(props) => props.theme.shadows.medium};
   overflow: hidden;
+  margin: 0 0 1.5rem;
+
+  @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
+    border-radius: ${(props) => props.theme.borderRadius.medium};
+  }
+
+  @media (max-width: 480px) {
+    border-radius: ${(props) => props.theme.borderRadius.small};
+  }
 `;
 
 const Header = styled.div`
@@ -29,11 +38,13 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 
   @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
+    align-items: stretch;
+    gap: 0.9rem;
   }
 `;
 
@@ -44,9 +55,25 @@ const Title = styled.h3`
 
 const TaskCount = styled.span`
   background: rgba(255, 255, 255, 0.2);
-  padding: 0.25rem 0.75rem;
+  padding: 0.3rem 0.65rem;
   border-radius: ${(props) => props.theme.borderRadius.small};
   font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+`;
+
+const TitleGroup = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+
+  @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
+    justify-content: space-between;
+    width: 100%;
+  }
 `;
 
 const HeaderRight = styled.div`
@@ -99,6 +126,10 @@ const TabsContainer = styled.div`
   padding: 0.75rem 1.5rem;
   background: ${(props) => props.theme.colors.backgroundLight};
   border-bottom: 1px solid ${(props) => props.theme.colors.border};
+
+  @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
+    padding: 0.65rem 1rem;
+  }
 `;
 
 const TabButton = styled.button<{ $active: boolean }>`
@@ -142,6 +173,10 @@ const TaskItem = styled.div<{ $priority: string; $completed: boolean }>`
 
   &:last-child {
     border-bottom: none;
+  }
+
+  @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
+    padding: 1.25rem 1rem;
   }
 `;
 
@@ -791,14 +826,21 @@ export const TaskList: React.FC<TaskListProps> = ({
   return (
     <Container>
       <Header>
-        <Title>📋 {t('tasksTitle')}</Title>
-        <HeaderRight>
+        <TitleGroup>
+          <Title>📋 {t('tasksTitle')}</Title>
           <TaskCount>
-            {filteredTasks.length}
-            {filteredTasks.length !== tasks.length ? `/${tasks.length}` : ''}{' '}
-            {t('tasksCount')}
+            <span>{filteredTasks.length}</span>
+            {filteredTasks.length !== tasks.length && (
+              <>
+                <span>/</span>
+                <span>{tasks.length}</span>
+              </>
+            )}
+            <span>{t('tasksCount')}</span>
           </TaskCount>
-          {onCreateNewTask && (
+        </TitleGroup>
+        {onCreateNewTask && (
+          <HeaderRight>
             <InlineCreateButton
               type="button"
               onClick={onCreateNewTask}
@@ -806,8 +848,8 @@ export const TaskList: React.FC<TaskListProps> = ({
             >
               ➕ {t('newTask')}
             </InlineCreateButton>
-          )}
-        </HeaderRight>
+          </HeaderRight>
+        )}
       </Header>
 
       <TabsContainer role="tablist" aria-label={t('tasksTitle')}>

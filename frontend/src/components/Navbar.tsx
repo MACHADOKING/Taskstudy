@@ -10,8 +10,12 @@ import { notificationService } from '../services/notificationService';
 const Nav = styled.nav`
   background-color: ${(props) => props.theme.colors.primary};
   color: white;
-  padding: 1rem 2rem;
+  padding: 0.85rem 1.75rem;
   box-shadow: ${(props) => props.theme.shadows.medium};
+
+  @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
+    padding: 0.75rem 1.1rem;
+  }
 `;
 
 const NavContainer = styled.div`
@@ -19,15 +23,16 @@ const NavContainer = styled.div`
   margin: 0 auto;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1.25rem;
+  row-gap: 0.75rem;
+  flex-wrap: wrap;
   width: 100%;
 
   @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
-    justify-content: space-between;
-  }
-
-  @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
-    padding: 0 0.25rem;
+    gap: 1rem;
+    row-gap: 0.5rem;
+    padding: 0;
   }
 `;
 
@@ -60,8 +65,19 @@ const Brand = styled.span`
 
 const NavLinks = styled.div`
   display: flex;
-  gap: 2rem;
   align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  flex: 1 1 auto;
+  min-width: 200px;
+  flex-wrap: wrap;
+
+  @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
+    order: 3;
+    width: 100%;
+    justify-content: space-around;
+    gap: 1rem;
+  }
 `;
 
 const NavLink = styled(Link)`
