@@ -97,6 +97,11 @@ const OverviewDialog = styled.div`
   max-height: min(90vh, 620px);
   overflow-y: auto;
 
+  @media (min-width: ${(props) => props.theme.breakpoints.tablet}) {
+    max-height: none;
+    overflow-y: visible;
+  }
+
   @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
     padding: 24px;
     gap: 18px;

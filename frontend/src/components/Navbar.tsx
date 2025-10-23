@@ -39,7 +39,7 @@ const NavContainer = styled.div`
 const Logo = styled(Link)`
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.5rem;
   color: white;
   text-decoration: none;
   flex-shrink: 0;
@@ -66,7 +66,6 @@ const Brand = styled.span`
 const NavLinks = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 1.5rem;
   flex: 1 1 auto;
   min-width: 200px;
@@ -94,7 +93,7 @@ const NavLink = styled(Link)`
 const UserInfo = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   position: relative;
 `;
 
@@ -277,7 +276,7 @@ const SettingsContainer = styled.div`
 const DesktopNavGroup = styled.div`
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 0.75rem;
   margin-left: auto;
 
   @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
@@ -286,6 +285,8 @@ const DesktopNavGroup = styled.div`
 `;
 
 const DesktopSettings = styled(SettingsContainer)`
+  gap: 0.65rem;
+
   @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
     display: none;
   }
@@ -294,7 +295,7 @@ const DesktopSettings = styled(SettingsContainer)`
 const UserCluster = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
   margin-left: 0.75rem;
 
   @media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
