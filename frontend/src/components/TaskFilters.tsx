@@ -32,13 +32,13 @@ const FiltersContainer = styled.div<{ $collapsed?: boolean }>`
 	width: 100%;
 
 	@media (max-width: ${(props) => props.theme.breakpoints.tablet}) {
-		padding: ${(props) => (props.$collapsed ? '1rem 0' : '1.2rem 0')};
+		padding: ${(props) => (props.$collapsed ? '1rem 1.1rem' : '1.3rem 1.2rem')};
 		border-radius: ${(props) => props.theme.borderRadius.medium};
 		box-shadow: ${(props) => props.theme.shadows.small};
 	}
 
 	@media (max-width: 480px) {
-		padding: ${(props) => (props.$collapsed ? '0.9rem 0' : '1.1rem 0')};
+		padding: ${(props) => (props.$collapsed ? '0.95rem 0.9rem' : '1.15rem 1rem')};
 		margin-left: 0;
 		margin-right: 0;
 	}
@@ -280,7 +280,9 @@ export const TaskFiltersComponent: React.FC<TaskFiltersProps> = ({
 	onToggleCollapse,
 }) => {
 	const { t, language } = useTranslation();
-	const filterHeading = language?.startsWith('pt') ? 'Filtrar' : t('filterSearchTasks');
+	const filterHeading = language?.startsWith('pt')
+		? '🔍 Filtrar'
+		: `🔍 ${t('filterSearchTasks')}`;
 
 	const handleFilterChange = (key: keyof TaskFilters, value: string) => {
 		onFiltersChange({
