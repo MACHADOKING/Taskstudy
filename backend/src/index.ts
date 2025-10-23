@@ -11,6 +11,7 @@ import notificationRoutes from './routes/notificationRoutes';
 import notificationCenterRoutes from './routes/notificationCenterRoutes';
 import accountRoutes from './routes/accountRoutes';
 import telegramRoutes from './routes/telegramRoutes';
+import schedulerRoutes from './routes/schedulerRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -48,6 +49,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/notification-center', notificationCenterRoutes);
 app.use('/api/account', accountRoutes);
 app.use('/api/telegram', telegramRoutes);
+app.use('/api/scheduler', schedulerRoutes);
 
 // 404 Handler
 app.use((_req: Request, res: Response) => {

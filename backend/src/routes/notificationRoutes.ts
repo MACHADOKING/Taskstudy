@@ -37,13 +37,14 @@ router.get(
       const targetEmailRaw = req.query.targetEmail;
       const targetEmail = typeof targetEmailRaw === 'string' ? targetEmailRaw : undefined;
 
-      await sendPendingTasksDigest(targetEmail);
+      const summary = await sendPendingTasksDigest(targetEmail);
 
       res.status(200).json({
         success: true,
         message: targetEmail
-          ? `Resumo enviado para ${targetEmail}`
-          : 'Resumo enviado para usuários elegíveis',
+          ? `Resumo diário processado para ${targetEmail}`
+          : 'Resumo diário processado para usuários elegíveis',
+        summary,
       });
     } catch (error) {
       console.error('Notification digest trigger error:', error);

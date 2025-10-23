@@ -7,6 +7,10 @@ export interface PendingTaskDigestItem {
   formattedDueDate: string;
   statusLabel: string;
   daysRemaining: number;
+  priorityLabel: string;
+  priorityScore: number;
+  isCritical: boolean;
+  isOverdue: boolean;
 }
 
 interface EmailOptions {
@@ -132,7 +136,8 @@ export const generateTaskReminderEmail = (
 export const generatePendingTasksDigestEmail = (
   userName: string,
   summaryDate: Date,
-  tasks: PendingTaskDigestItem[]
+  tasks: PendingTaskDigestItem[],
+  highlights: PendingTaskDigestItem[]
 ): string => {
   const formatDate = (date: Date) =>
     date.toLocaleDateString('pt-BR', {
@@ -150,6 +155,24 @@ export const generatePendingTasksDigestEmail = (
 
   const summaryLabel = `${formatDate(summaryDate)} às ${formatTime(summaryDate)}`;
 
+  const highlightBlock = highlights.length
+    ? `
+        <div style="margin-top: 24px; padding: 16px; border-radius: 12px; background: linear-gradient(135deg, rgba(250, 204, 21, 0.18), rgba(249, 115, 22, 0.12));">
+          <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #92400e;">Prioridades do dia</h3>
+          <ul style="margin: 0; padding-left: 20px; color: #78350f;">
+            ${highlights
+              .map(
+                (task) => `
+              <li style="margin-bottom: 6px;">
+                <strong>${task.title}</strong>
+                <div style="font-size: 13px; opacity: 0.9;">${task.statusLabel} · Prioridade ${task.priorityLabel}</div>
+              </li>`
+              )
+              .join('')}
+          </ul>
+        </div>`
+    : '';
+
   const rows = tasks
     .map(
       (task) => `
@@ -163,6 +186,9 @@ export const generatePendingTasksDigestEmail = (
           </td>
           <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
             ${task.statusLabel}
+            <div style="color: #f97316; font-size: 12px; margin-top: 4px;">
+              Prioridade ${task.priorityLabel}
+            </div>
           </td>
         </tr>
       `
@@ -210,6 +236,7 @@ export const generatePendingTasksDigestEmail = (
               Abaixo está a relação das próximas entregas e quanto tempo falta para cada uma.
               Planeje seu tempo e foque no que precisa ser feito hoje!
             </p>
+            ${highlightBlock}
             <table>
               <thead>
                 <tr>
@@ -235,6 +262,222 @@ export const generatePendingTasksDigestEmail = (
         </div>
       </div>
     </body>
+    </html>
+  `;
+};
+
+export interface WeeklyReportEmailInput {
+  userName: string;
+  weekRangeLabel: string;
+  created: number;
+  completed: number;
+  pending: number;
+  completionRate: number;
+  highlightSubjects: Array<{ subject: string; count: number }>;
+  suggestions: string[];
+}
+
+export const generateWeeklyReportEmail = (input: WeeklyReportEmailInput): string => {
+  const subjectList = input.highlightSubjects.length
+    ? `<ul style="padding-left: 18px; margin: 12px 0;">
+        ${input.highlightSubjects
+          .map(
+            (item) => `
+              <li style="margin-bottom: 8px; color: #1f2937;">
+                <strong>${item.subject}</strong>: ${item.count} tarefa${item.count > 1 ? 's' : ''} em foco
+              </li>`
+          )
+          .join('')}
+      </ul>`
+    : '<p style="color: #4b5563;">Esta semana ficou bem distribuída entre suas matérias. Excelente equilíbrio! ✅</p>';
+
+  const tipList = input.suggestions.length
+    ? `<ol style="padding-left: 20px; margin: 12px 0; color: #1f2937;">
+        ${input.suggestions
+          .map((tip) => `<li style="margin-bottom: 10px;">${tip}</li>`)
+          .join('')}
+      </ol>`
+    : '';
+
+  return `
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Relatório semanal - TaskStudy</title>
+        <style>
+          body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background: #f8fafc; color: #0f172a; }
+          .container { max-width: 680px; margin: 0 auto; padding: 24px; }
+          .card { background: #ffffff; border-radius: 18px; box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08); overflow: hidden; }
+          .header { background: linear-gradient(135deg, #4f46e5, #6366f1); padding: 32px 36px; color: #ffffff; }
+          .header h1 { margin: 0; font-size: 26px; }
+          .header p { margin-top: 8px; font-size: 15px; opacity: 0.9; }
+          .content { padding: 32px 36px; }
+          .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin: 24px 0; }
+          .stat-card { background: #f1f5f9; border-radius: 14px; padding: 16px; }
+          .stat-label { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; margin-bottom: 8px; }
+          .stat-value { font-size: 26px; font-weight: 700; color: #0f172a; }
+          .badge { display: inline-flex; align-items: center; padding: 6px 14px; border-radius: 999px; background: rgba(79, 70, 229, 0.15); color: #4338ca; font-weight: 600; font-size: 13px; margin-top: 14px; }
+          .footer { padding: 24px 36px; background: #f8fafc; color: #475569; font-size: 13px; text-align: center; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="card">
+            <div class="header">
+              <h1>Seu painel semanal está pronto, ${input.userName.split(' ')[0]}! 📊</h1>
+              <p>Período analisado: ${input.weekRangeLabel}</p>
+            </div>
+            <div class="content">
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-label">Criadas</div>
+                  <div class="stat-value">${input.created}</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Concluídas</div>
+                  <div class="stat-value">${input.completed}</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Pendentes</div>
+                  <div class="stat-value">${input.pending}</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-label">Taxa de conclusão</div>
+                  <div class="stat-value">${Math.round(input.completionRate * 100)}%</div>
+                </div>
+              </div>
+              <span class="badge">Resumo da semana</span>
+              <p style="margin-top: 18px; line-height: 1.6; color: #1e293b;">
+                Excelente! Você manteve o foco e encerrou importantes etapas nesta semana.
+                Aqui vão os tópicos que merecem atenção especial:
+              </p>
+              ${subjectList}
+              ${tipList}
+            </div>
+            <div class="footer">
+              <p>Continue registrando suas conquistas. Nós avisaremos quando algo precisar da sua atenção! 💪</p>
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+};
+
+export interface MonthlyPerformanceEmailInput {
+  userName: string;
+  monthLabel: string;
+  created: number;
+  completed: number;
+  pending: number;
+  completionRate: number;
+  averageCompletionHours?: number;
+  bestDay?: { label: string; completions: number };
+  focusAreas: Array<{ subject: string; pending: number }>;
+  achievements: string[];
+}
+
+export const generateMonthlyPerformanceEmail = (
+  input: MonthlyPerformanceEmailInput
+): string => {
+  const focusList = input.focusAreas.length
+    ? `<ul style="padding-left: 18px; margin: 12px 0;">
+        ${input.focusAreas
+          .map(
+            (item) => `
+              <li style="margin-bottom: 8px; color: #0f172a;">
+                <strong>${item.subject}</strong>: ${item.pending} tarefa${item.pending > 1 ? 's' : ''} esperando conclusão
+              </li>`
+          )
+          .join('')}
+      </ul>`
+    : '<p style="color: #4b5563;">Você encerrou todas as tarefas abertas do mês. Excelente domínio! 🎉</p>';
+
+  const achievementList = input.achievements.length
+    ? `<ul style="padding-left: 18px; margin: 12px 0;">
+        ${input.achievements
+          .map((item) => `<li style="margin-bottom: 8px; color: #334155;">${item}</li>`)
+          .join('')}
+      </ul>`
+    : '';
+
+  const avgBlock = input.averageCompletionHours
+    ? `<div style="margin-top: 18px; padding: 16px; border-radius: 12px; background: rgba(59, 130, 246, 0.12); color: #1d4ed8;">
+        Tempo médio para concluir tarefas: <strong>${Math.round(input.averageCompletionHours)} horas</strong>
+      </div>`
+    : '';
+
+  const bestDayBlock = input.bestDay
+    ? `<div style="margin-top: 12px; padding: 16px; border-radius: 12px; background: rgba(16, 185, 129, 0.12); color: #047857;">
+        Dia de melhor desempenho: <strong>${input.bestDay.label}</strong> (${input.bestDay.completions} conclusão${
+        input.bestDay.completions > 1 ? 'es' : 'a'
+      })
+      </div>`
+    : '';
+
+  return `
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Relatório mensal - TaskStudy</title>
+        <style>
+          body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; background: #f1f5f9; color: #0f172a; }
+          .container { max-width: 720px; margin: 0 auto; padding: 28px; }
+          .card { background: #ffffff; border-radius: 20px; box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12); overflow: hidden; }
+          .header { background: linear-gradient(135deg, #0ea5e9, #2563eb); padding: 36px; color: #ffffff; }
+          .header h1 { margin: 0; font-size: 28px; }
+          .header p { margin-top: 10px; font-size: 15px; opacity: 0.85; }
+          .content { padding: 36px; }
+          .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 18px; margin: 26px 0; }
+          .metric { background: #eff6ff; border-radius: 16px; padding: 18px; }
+          .metric-label { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: #3b82f6; margin-bottom: 6px; }
+          .metric-value { font-size: 30px; font-weight: 700; color: #1d4ed8; }
+          .footer { padding: 26px 36px; background: #f8fafc; color: #475569; font-size: 13px; text-align: center; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="card">
+            <div class="header">
+              <h1>${input.userName.split(' ')[0]}, seu mês no TaskStudy 🚀</h1>
+              <p>Visão geral do período: ${input.monthLabel}</p>
+            </div>
+            <div class="content">
+              <div class="metrics">
+                <div class="metric">
+                  <div class="metric-label">Criadas</div>
+                  <div class="metric-value">${input.created}</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-label">Concluídas</div>
+                  <div class="metric-value">${input.completed}</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-label">Pendentes</div>
+                  <div class="metric-value">${input.pending}</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-label">Taxa de conclusão</div>
+                  <div class="metric-value">${Math.round(input.completionRate * 100)}%</div>
+                </div>
+              </div>
+              ${avgBlock}
+              ${bestDayBlock}
+              <h2 style="margin-top: 28px; color: #0f172a;">Onde concentrar energia no próximo ciclo</h2>
+              ${focusList}
+              <h2 style="margin-top: 32px; color: #0f172a;">Seu quadro de conquistas</h2>
+              ${achievementList}
+            </div>
+            <div class="footer">
+              <p>Estamos aqui para lembrar do que importa e celebrar cada avanço com você! 🌟</p>
+            </div>
+          </div>
+        </div>
+      </body>
     </html>
   `;
 };

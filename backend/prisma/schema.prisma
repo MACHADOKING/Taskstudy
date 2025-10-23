@@ -97,4 +97,7 @@ enum AuthProvider {
 enum NotificationType {
   DAILY_SUMMARY
   URGENT_ALERT
+  DAILY_PENDING_TASKS
+  WEEKLY_REPORT
+  MONTHLY_REPORT
 }

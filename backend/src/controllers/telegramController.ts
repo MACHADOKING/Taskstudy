@@ -36,11 +36,13 @@ const extractLinkCode = (text: string | undefined): string | null => {
 const buildStartMessage = (): string => {
   return (
     'Olá! 👋\n\n' +
+    'Sou o bot do TaskStudy e vou te avisar sobre tarefas pendentes, lembretes importantes e relatórios do seu progresso.\n' +
+    'Este canal é apenas para notificações automáticas — não consigo responder mensagens, combinado? 🔔\n\n' +
     'Para conectar seu Telegram ao TaskStudy, siga estes passos:\n' +
-    '1. Abra o painel TaskStudy em Configurações de Conta.\n' +
-    '2. Ative o canal do Telegram nas preferências de notificação.\n' +
-    '3. Copie o código exibido e envie aqui, por exemplo: TS-ABC123.\n\n' +
-    'Assim que o código for validado, enviaremos os alertas de tarefas por aqui.'
+    '1. Abra o painel TaskStudy e acesse Configurações de Conta.\n' +
+    '2. Ative o canal do Telegram nas preferências de notificações.\n' +
+    '3. Copie o código exibido e envie aqui (ex.: TS-ABC123).\n\n' +
+    'Assim que o código for validado, começo a te atualizar periodicamente por aqui. Vamos em frente! 🚀'
   );
 };
 
