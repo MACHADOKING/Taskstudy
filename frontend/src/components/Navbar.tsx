@@ -66,7 +66,7 @@ const Brand = styled.span`
 const NavLinks = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
   flex: 0 0 auto;
   min-width: 0;
   flex-wrap: nowrap;
