@@ -288,7 +288,8 @@ export interface DailyDigestBatchSummary {
 }
 
 export const sendPendingTasksDigest = async (
-  recipientOverride?: string
+  recipientOverride?: string,
+  options?: DailyDigestOptions
 ): Promise<DailyDigestBatchSummary> => {
   const whereClause: Prisma.UserWhereInput | undefined = recipientOverride
     ? {
@@ -326,14 +327,17 @@ export const sendPendingTasksDigest = async (
 
   for (const user of users) {
     try {
+      const digestOptions: DailyDigestOptions | undefined = recipientOverride
+        ? {
+            ...options,
+            recipientOverride,
+            force: true,
+          }
+        : options;
+
       const result = await sendDigestForUser(
         user,
-        recipientOverride
-          ? {
-              recipientOverride,
-              force: true,
-            }
-          : undefined
+        digestOptions
       );
       if (result.status === 'sent') {
         digestsSent += 1;
@@ -849,6 +853,7 @@ export const sendMonthlyPerformanceReports = async (now = new Date()): Promise<R
 
 export interface SchedulerRunOptions {
   skipDaily?: boolean;
+  forceDaily?: boolean;
   forceWeekly?: boolean;
   forceMonthly?: boolean;
 }
@@ -869,7 +874,8 @@ export const triggerScheduledNotifications = async (
   };
 
   if (!options?.skipDaily) {
-    summary.daily = await sendPendingTasksDigest();
+    const dailyOptions = options?.forceDaily ? { force: true } : undefined;
+    summary.daily = await sendPendingTasksDigest(undefined, dailyOptions);
   }
 
   const shouldRunWeekly = options?.forceWeekly ?? now.getDay() === 1;

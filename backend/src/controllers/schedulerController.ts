@@ -55,10 +55,15 @@ export const runScheduledNotifications = async (
       return;
     }
 
-  const options: SchedulerRunOptions = {};
+    const options: SchedulerRunOptions = {};
 
     if (parseBoolean(req.query.skipDaily) === true) {
       options.skipDaily = true;
+    }
+
+    const forceDaily = parseBoolean(req.query.forceDaily);
+    if (forceDaily !== undefined) {
+      options.forceDaily = forceDaily;
     }
 
     const forceWeekly = parseBoolean(req.query.forceWeekly);
