@@ -39,10 +39,10 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-validator": "^7.0.1",
-    "google-auth-library": "^9.0.0",
-    "jsonwebtoken": "^9.0.2",
-    "node-cron": "^3.0.3",
-    "nodemailer": "^6.9.7"
+  "google-auth-library": "^9.0.0",
+  "jsonwebtoken": "^9.0.2",
+  "node-cron": "^3.0.3",
+  "sib-api-v3-sdk": "^10.2.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.48.0",
@@ -52,8 +52,7 @@
     "@types/jest": "^29.5.5",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20.10.6",
-    "@types/node-cron": "^3.0.11",
-    "@types/nodemailer": "^6.4.14",
+  "@types/node-cron": "^3.0.11",
     "@types/supertest": "^2.0.16",
     "@typescript-eslint/eslint-plugin": "^6.16.0",
     "@typescript-eslint/parser": "^6.16.0",

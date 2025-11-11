@@ -1,5 +1,4 @@
-import nodemailer, { Transporter } from 'nodemailer';
-import type SMTPTransport from 'nodemailer/lib/smtp-transport';
+import SibApiV3Sdk from 'sib-api-v3-sdk';
 
 export interface PendingTaskDigestItem {
   title: string;
@@ -20,68 +19,77 @@ interface EmailOptions {
   html: string;
 }
 
-let cachedTransporter: Transporter | null = null;
+let cachedTransactionalApi: SibApiV3Sdk.TransactionalEmailsApi | null = null;
 
-const resolveBoolean = (value: string | undefined, fallback: boolean): boolean => {
-  if (value === undefined) {
+const getTransactionalApi = (): SibApiV3Sdk.TransactionalEmailsApi => {
+  if (cachedTransactionalApi) {
+    return cachedTransactionalApi;
+  }
+
+  const apiKey = process.env.SMTP_API ?? process.env.BREVO_API_KEY;
+  if (!apiKey) {
+    throw new Error('Brevo API key is not configured. Provide SMTP_API (or BREVO_API_KEY).');
+  }
+
+  const apiClient = SibApiV3Sdk.ApiClient.instance;
+  apiClient.authentications['api-key'].apiKey = apiKey;
+
+  cachedTransactionalApi = new SibApiV3Sdk.TransactionalEmailsApi();
+  return cachedTransactionalApi;
+};
+
+type SenderInfo = { name: string; email: string };
+
+const stripQuotes = (value: string): string => value.replace(/^['"]|['"]$/g, '').trim();
+
+const resolveSender = (): SenderInfo => {
+  const fallback: SenderInfo = {
+    name: 'TaskStudy',
+    email: process.env.SMTP_LOGIN ?? process.env.SMTP_USER ?? 'noreply@taskstudy.com',
+  };
+
+  const raw = process.env.SMTP_FROM?.trim();
+  if (!raw) {
     return fallback;
   }
 
-  return ['true', '1', 'yes'].includes(value.toLowerCase());
-};
-
-// Create or reuse transporter with environment-based configuration
-const getTransporter = (): Transporter => {
-  if (cachedTransporter) {
-    return cachedTransporter;
+  const cleaned = stripQuotes(raw);
+  const match = cleaned.match(/^(.*)<([^>]+)>$/);
+  if (match) {
+    const name = stripQuotes(match[1]).trim() || fallback.name;
+    return {
+      name,
+      email: match[2].trim(),
+    };
   }
 
-  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
-  const port = Number(process.env.SMTP_PORT || 465);
-  const user = process.env.SMTP_LOGIN ?? process.env.SMTP_USER;
-  const pass = process.env.SMTP_KEY ?? process.env.SMTP_PASS;
-  const secure = resolveBoolean(process.env.SMTP_SECURE, port === 465);
-  const startTls = resolveBoolean(process.env.SMTP_STARTTLS, port === 587);
-
-  if (!user || !pass) {
-    throw new Error('SMTP credentials are not configured. Provide SMTP_LOGIN and SMTP_KEY (or legacy SMTP_USER/SMTP_PASS).');
+  if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(cleaned)) {
+    return {
+      name: fallback.name,
+      email: cleaned,
+    };
   }
 
-  const transporterConfig: SMTPTransport.Options = {
-    host,
-    port,
-    secure,
-    auth: {
-      user,
-      pass,
-    },
+  return {
+    name: cleaned,
+    email: fallback.email,
   };
-
-  if (startTls) {
-    transporterConfig.secure = false;
-    transporterConfig.requireTLS = true;
-  }
-
-  cachedTransporter = nodemailer.createTransport(transporterConfig);
-
-  return cachedTransporter;
 };
 
 // Send email
 export const sendEmail = async (options: EmailOptions): Promise<void> => {
   try {
-    const transporter = getTransporter();
+    const transactionalApi = getTransactionalApi();
+    const sender = resolveSender();
 
-    await transporter.sendMail({
-      from:
-        process.env.SMTP_FROM ||
-        (process.env.SMTP_LOGIN || process.env.SMTP_USER
-          ? `TaskStudy <${process.env.SMTP_LOGIN ?? process.env.SMTP_USER}>`
-          : 'TaskStudy <noreply@taskstudy.com>'),
-      to: options.to,
+    const payload: SibApiV3Sdk.SendSmtpEmail = {
+      sender,
+      to: [{ email: options.to }],
       subject: options.subject,
-      html: options.html,
-    });
+      htmlContent: options.html,
+    };
+
+    await transactionalApi.sendTransacEmail(payload);
 
     console.log(`✅ Email sent to ${options.to}`);
   } catch (error) {
