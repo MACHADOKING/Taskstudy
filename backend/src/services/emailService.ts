@@ -62,7 +62,7 @@ const stripQuotes = (value: string): string => value.replace(/^['"]|['"]$/g, '')
 const resolveSender = (): SenderInfo => {
   const fallback: SenderInfo = {
     name: 'TaskStudy',
-    email: process.env.SMTP_LOGIN ?? process.env.SMTP_USER ?? 'noreply@taskstudy.com',
+    email: process.env.SMTP_LOGIN ?? process.env.SMTP_USER ?? 'noreply@taskstudy.site',
   };
 
   const raw = process.env.SMTP_FROM?.trim();
