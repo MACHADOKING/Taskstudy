@@ -59,15 +59,34 @@ const BrevoSdk = SibApiV3Sdk as unknown as BrevoSdkModule;
 
 const stripQuotes = (value: string): string => value.replace(/^['"]|['"]$/g, '').trim();
 
+const DEFAULT_SENDER_EMAIL = 'noreply@taskstudy.site';
+const ALLOWED_SENDER_DOMAINS = ['taskstudy.site'];
+
+const withApprovedDomain = (sender: SenderInfo): SenderInfo => {
+  const [, domain = ''] = sender.email.split('@');
+  if (ALLOWED_SENDER_DOMAINS.includes(domain.toLowerCase())) {
+    return sender;
+  }
+
+  console.warn(
+    `Sender ${sender.email} não está autorizado. Aplicando fallback ${DEFAULT_SENDER_EMAIL}.`
+  );
+
+  return {
+    name: sender.name,
+    email: DEFAULT_SENDER_EMAIL,
+  };
+};
+
 const resolveSender = (): SenderInfo => {
   const fallback: SenderInfo = {
     name: 'TaskStudy',
-    email: process.env.SMTP_LOGIN ?? process.env.SMTP_USER ?? 'noreply@taskstudy.site',
+    email: process.env.SMTP_LOGIN ?? process.env.SMTP_USER ?? DEFAULT_SENDER_EMAIL,
   };
 
   const raw = process.env.SMTP_FROM?.trim();
   if (!raw) {
-    return fallback;
+    return withApprovedDomain(fallback);
   }
 
   const cleaned = stripQuotes(raw);
@@ -97,7 +116,7 @@ const resolveSender = (): SenderInfo => {
 export const sendEmail = async (options: EmailOptions): Promise<void> => {
   try {
     const transactionalApi = getTransactionalApi();
-    const sender = resolveSender();
+    const sender = withApprovedDomain(resolveSender());
 
     const payload: SendEmailPayload = {
       sender,
