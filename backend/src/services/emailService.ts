@@ -19,9 +19,9 @@ interface EmailOptions {
   html: string;
 }
 
-let cachedTransactionalApi: SibApiV3Sdk.TransactionalEmailsApi | null = null;
+let cachedTransactionalApi: TransactionalEmailsApi | null = null;
 
-const getTransactionalApi = (): SibApiV3Sdk.TransactionalEmailsApi => {
+const getTransactionalApi = (): TransactionalEmailsApi => {
   if (cachedTransactionalApi) {
     return cachedTransactionalApi;
   }
@@ -31,14 +31,31 @@ const getTransactionalApi = (): SibApiV3Sdk.TransactionalEmailsApi => {
     throw new Error('Brevo API key is not configured. Provide SMTP_API (or BREVO_API_KEY).');
   }
 
-  const apiClient = SibApiV3Sdk.ApiClient.instance;
+  const apiClient = BrevoSdk.ApiClient.instance;
   apiClient.authentications['api-key'].apiKey = apiKey;
 
-  cachedTransactionalApi = new SibApiV3Sdk.TransactionalEmailsApi();
+  cachedTransactionalApi = new BrevoSdk.TransactionalEmailsApi();
   return cachedTransactionalApi;
 };
 
 type SenderInfo = { name: string; email: string };
+interface TransactionalEmailsApi {
+  sendTransacEmail(payload: SendEmailPayload): Promise<unknown>;
+}
+
+interface SendEmailPayload {
+  sender: SenderInfo;
+  to: Array<{ email: string }>;
+  subject: string;
+  htmlContent: string;
+}
+
+type BrevoSdkModule = {
+  ApiClient: { instance: { authentications: Record<string, { apiKey: string }> } };
+  TransactionalEmailsApi: new () => TransactionalEmailsApi;
+};
+
+const BrevoSdk = SibApiV3Sdk as unknown as BrevoSdkModule;
 
 const stripQuotes = (value: string): string => value.replace(/^['"]|['"]$/g, '').trim();
 
@@ -82,7 +99,7 @@ export const sendEmail = async (options: EmailOptions): Promise<void> => {
     const transactionalApi = getTransactionalApi();
     const sender = resolveSender();
 
-    const payload: SibApiV3Sdk.SendSmtpEmail = {
+    const payload: SendEmailPayload = {
       sender,
       to: [{ email: options.to }],
       subject: options.subject,
