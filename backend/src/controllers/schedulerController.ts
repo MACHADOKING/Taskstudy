@@ -62,9 +62,7 @@ export const runScheduledNotifications = async (
     }
 
     const forceDaily = parseBoolean(req.query.forceDaily);
-    if (forceDaily !== undefined) {
-      options.forceDaily = forceDaily;
-    }
+    options.forceDaily = forceDaily !== undefined ? forceDaily : true;
 
     const forceWeekly = parseBoolean(req.query.forceWeekly);
     if (forceWeekly !== undefined) {
