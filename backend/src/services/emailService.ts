@@ -38,13 +38,13 @@ const getTransporter = (): Transporter => {
 
   const host = process.env.SMTP_HOST || 'smtp.gmail.com';
   const port = Number(process.env.SMTP_PORT || 465);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+  const user = process.env.SMTP_LOGIN ?? process.env.SMTP_USER;
+  const pass = process.env.SMTP_KEY ?? process.env.SMTP_PASS;
   const secure = resolveBoolean(process.env.SMTP_SECURE, port === 465);
-  const startTls = resolveBoolean(process.env.SMTP_STARTTLS, false);
+  const startTls = resolveBoolean(process.env.SMTP_STARTTLS, port === 587);
 
   if (!user || !pass) {
-    throw new Error('SMTP credentials are not configured. Provide SMTP_USER and SMTP_PASS.');
+    throw new Error('SMTP credentials are not configured. Provide SMTP_LOGIN and SMTP_KEY (or legacy SMTP_USER/SMTP_PASS).');
   }
 
   const transporterConfig: SMTPTransport.Options = {
@@ -75,7 +75,9 @@ export const sendEmail = async (options: EmailOptions): Promise<void> => {
     await transporter.sendMail({
       from:
         process.env.SMTP_FROM ||
-        (process.env.SMTP_USER ? `TaskStudy <${process.env.SMTP_USER}>` : 'TaskStudy <noreply@taskstudy.com>'),
+        (process.env.SMTP_LOGIN || process.env.SMTP_USER
+          ? `TaskStudy <${process.env.SMTP_LOGIN ?? process.env.SMTP_USER}>`
+          : 'TaskStudy <noreply@taskstudy.com>'),
       to: options.to,
       subject: options.subject,
       html: options.html,
