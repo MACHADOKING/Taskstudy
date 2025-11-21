@@ -51,6 +51,6 @@ services:
 # Database
 databases:
   - name: taskstudy-db
-    databaseName: taskstudy
-    user: taskstudy_user
+    databaseName: taskstudy_db_ilt9
+    user: taskstudy_db_ilt9_user
     plan: free
